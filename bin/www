@@ -4,13 +4,14 @@
  * Module dependencies.
  */
 var fs = require('fs')
-var spdy = require('spdy')
+var http = require('http');
+const http2 = require('http2')
 var app = require('../app');
 var debug = require('debug')('express:server');
-// var http = require('http');
-const spdyOpts = {
+const opts = {
   key: fs.readFileSync('bin/test.key'),
   cert: fs.readFileSync('bin/test.crt'),
+  allowHTTP1: true
 };
 /**
  * Get port from environment and store in Express.
@@ -24,7 +25,8 @@ app.set('port', port);
  */
 
 // var server = http.createServer(app);
-const server = spdy.createServer(spdyOpts, app);
+
+const server = http2.createSecureServer(opts, app);
 /**
  * Listen on provided port, on all network interfaces.
  */

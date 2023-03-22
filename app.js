@@ -1,13 +1,21 @@
 var createError = require('http-errors');
 var express = require('express');
+const http2Express = require('http2-express-bridge')
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var sampleRouter = require('./routes/sample');
 
-var app = express();
-
+var app = http2Express(express);
+app.all('*',function (req, res, next) {
+  res.header('Access-Control-Allow-Origin','http://localhost:3001'); //当允许携带cookies此处的白名单不能写’*’
+  res.header('Access-Control-Allow-Headers','content-type,Content-Length, Authorization,Origin,Accept,X-Requested-With'); //允许的请求头
+  res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT'); //允许的请求方法
+  res.header('Access-Control-Allow-Credentials',true);  //允许携带cookies
+  next();
+});
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -20,7 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-
+app.use('/sample', sampleRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
